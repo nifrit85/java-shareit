@@ -7,6 +7,9 @@ import ru.practicum.shareit.user.dao.UserDao;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.model.UserDto;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @AllArgsConstructor
 public class UserService {
@@ -25,6 +28,13 @@ public class UserService {
 
     public UserDto get(Long id) {
         return UserMapper.toDto(userDao.get(id));
+    }
+
+    public List<UserDto> get() {
+        return userDao.get()
+                .stream()
+                .map(UserMapper::toDto)
+                .collect(Collectors.toList());
     }
 
     public void delete(Long id) {

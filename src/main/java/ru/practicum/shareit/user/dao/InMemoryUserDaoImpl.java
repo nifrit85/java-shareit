@@ -6,9 +6,7 @@ import ru.practicum.shareit.exception.EmailAlreadyInUse;
 import ru.practicum.shareit.exception.NotFound;
 import ru.practicum.shareit.user.model.User;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 @Repository
 @Slf4j
@@ -30,17 +28,29 @@ public class InMemoryUserDaoImpl implements UserDao {
     @Override
     public User update(Long id, User user) {
         checkExistence(id);
-        checkEmail(user);
         user.setId(id);
-        users.put(id, user);
-        log.debug("Пользователь обновлён {}", user);
-        return get(id);
+        checkEmail(user);
+        User userToUpdate = get(id);
+        if (user.getName() != null){
+            userToUpdate.setName(user.getName());
+        }
+        if (user.getEmail() != null){
+            userToUpdate.setEmail(user.getEmail());
+        }
+        users.put(id, userToUpdate);
+        log.debug("Пользователь обновлён {}", userToUpdate);
+        return userToUpdate ;
     }
 
     @Override
     public User get(Long id) {
         checkExistence(id);
         return users.get(id);
+    }
+
+    @Override
+    public List<User> get() {
+        return new ArrayList<>(users.values());
     }
 
     @Override
