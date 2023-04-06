@@ -26,20 +26,19 @@ public class InMemoryUserDaoImpl implements UserDao {
     }
 
     @Override
-    public User update(Long id, User user) {
-        checkExistence(id);
-        user.setId(id);
+    public User update(User user) {
+        checkExistence(user.getId());
         checkEmail(user);
-        User userToUpdate = get(id);
-        if (user.getName() != null){
+        User userToUpdate = get(user.getId());
+        if (user.getName() != null) {
             userToUpdate.setName(user.getName());
         }
-        if (user.getEmail() != null){
+        if (user.getEmail() != null) {
             userToUpdate.setEmail(user.getEmail());
         }
-        users.put(id, userToUpdate);
+        users.put(user.getId(), userToUpdate);
         log.debug("Пользователь обновлён {}", userToUpdate);
-        return userToUpdate ;
+        return userToUpdate;
     }
 
     @Override
@@ -59,6 +58,11 @@ public class InMemoryUserDaoImpl implements UserDao {
         users.remove(id);
     }
 
+    /**
+     * Метод проверки дублирования поля Email
+     *
+     * @throws EmailAlreadyInUse Адрес электронной почты уже используется
+     */
     private void checkEmail(User user) {
         for (User userToCheck : users.values()) {
             if (userToCheck.getEmail().equals(user.getEmail()) && !Objects.equals(userToCheck.getId(), user.getId())) {
@@ -68,6 +72,11 @@ public class InMemoryUserDaoImpl implements UserDao {
         }
     }
 
+    /**
+     * Метод проверки сущетвования пользователя
+     *
+     * @throws NotFound Пользователь не найден
+     */
     private void checkExistence(Long id) {
         if (!users.containsKey(id)) {
             log.debug("Пользователь не найден. ID = {}", id);
