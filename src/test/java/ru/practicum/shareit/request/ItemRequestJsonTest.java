@@ -9,7 +9,6 @@ import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.json.JsonContent;
 import ru.practicum.shareit.item.model.ItemShortDto;
 import ru.practicum.shareit.request.model.ItemRequestDto;
-import ru.practicum.shareit.user.model.UserDto;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
