@@ -40,6 +40,7 @@ import static ru.practicum.shareit.booking.BookingStatus.APPROVED;
 
 @SpringBootTest
 class ItemServiceTest {
+    private static final LocalDateTime SOME_DATE = LocalDateTime.of(2023, 5, 9, 11, 20, 0);
     @MockBean
     private ItemRepository mockItemRepository;
     @Autowired
@@ -52,7 +53,6 @@ class ItemServiceTest {
     private CommentRepository mockCommentRepository;
     @MockBean
     private BookingRepository mockBookingRepository;
-    private static final LocalDateTime SOME_DATE = LocalDateTime.of(2023, 5, 9, 11, 20, 0);
     private User userInRepository;
     private ItemRequest itemRequestInRepository;
     private ItemDto itemDtoInput;
@@ -172,8 +172,8 @@ class ItemServiceTest {
         commentList.add(commentInRepository1);
         commentList.add(commentInRepository2);
 
-        List<CommentDto> commentDtoList = commentList.
-                stream()
+        List<CommentDto> commentDtoList = commentList
+                .stream()
                 .map(CommentMapper::toDto)
                 .collect(Collectors.toList());
 
@@ -397,7 +397,7 @@ class ItemServiceTest {
 
     @Test
     @DisplayName("Проверка исключения NotFound")
-    void NotFoundTest() {
+    void notFoundTest() {
         ItemDto itemDtoInput = ItemDto.builder()
                 .name("update")
                 .description("update")

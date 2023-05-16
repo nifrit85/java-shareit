@@ -99,6 +99,6 @@ public interface ItemService {
      * @param itemRequests список запросов
      * @return список вещей
      */
-
     List<Item> findAllByRequestIn(List<ItemRequest> itemRequests);
+
 }

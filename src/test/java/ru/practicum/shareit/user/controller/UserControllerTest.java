@@ -2,6 +2,8 @@ package ru.practicum.shareit.user.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -29,21 +31,27 @@ class UserControllerTest {
     @MockBean
     private UserService mockUserService;
 
-    @Test
-    void createTest() throws Exception {
+    private UserDto userDtoInput;
+    private UserDto userDtoOutput;
 
-        //Пользователь для сохранения
-        UserDto userDtoInput = UserDto.builder()
+    @BeforeEach
+    void beforeEach() {
+        //Входные данные
+        userDtoInput = UserDto.builder()
                 .name("user")
                 .email("user@user.com")
                 .build();
-
-        //Ожидаемый результат
-        UserDto userDtoOutput = UserDto.builder()
+        //Ожидаемые данные
+        userDtoOutput = UserDto.builder()
                 .id(1L)
                 .name("user")
                 .email("user@user.com")
                 .build();
+    }
+
+    @Test
+    @DisplayName("Сохранение пользователя")
+    void createTest() throws Exception {
 
         when(mockUserService.create(any(UserDto.class)))
                 .thenReturn(userDtoOutput);
@@ -83,20 +91,14 @@ class UserControllerTest {
     }
 
     @Test
+    @DisplayName("Изменение пользователя")
     void updateTest() throws Exception {
-        //Пользователь для изменения
-        UserDto userDtoInput = UserDto.builder()
-                .id(1L)
-                .name("updated")
-                .email("updated@user.com")
-                .build();
-
-        //Ожидаемый результат
-        UserDto userDtoOutput = UserDto.builder()
-                .id(1L)
-                .name("updated")
-                .email("updated@user.com")
-                .build();
+        //Входные данные
+        userDtoInput.setName("update");
+        userDtoInput.setEmail("update@user.com");
+        //Ожидаемые данные
+        userDtoOutput.setName("update");
+        userDtoOutput.setEmail("update@user.com");
 
         when(mockUserService.update(anyLong(), any(UserDto.class)))
                 .thenReturn(userDtoOutput);
@@ -114,14 +116,8 @@ class UserControllerTest {
     }
 
     @Test
+    @DisplayName("Получение пользователя")
     void getTest() throws Exception {
-        //Ожидаемый результат
-        UserDto userDtoOutput = UserDto.builder()
-                .id(1L)
-                .name("user")
-                .email("user@user.com")
-                .build();
-
         when(mockUserService.get(anyLong()))
                 .thenReturn(userDtoOutput);
 
@@ -155,6 +151,7 @@ class UserControllerTest {
     }
 
     @Test
+    @DisplayName("Удаление пользователя")
     void deleteTest() throws Exception {
         doNothing().when(mockUserService).delete(anyLong());
 

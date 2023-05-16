@@ -32,6 +32,7 @@ import static org.mockito.Mockito.when;
 
 @SpringBootTest
 class ItemRequestServiceTest {
+    private static final LocalDateTime SOME_DATE = LocalDateTime.of(2023, 5, 9, 11, 20, 0);
     @MockBean
     private ItemRequestRepository mockItemRequestRepository;
     @MockBean
@@ -40,7 +41,6 @@ class ItemRequestServiceTest {
     private ItemRepository mockItemRepository;
     @Autowired
     private ItemRequestServiceImpl itemRequestService;
-    private static final LocalDateTime SOME_DATE = LocalDateTime.of(2023, 5, 9, 11, 20, 0);
     private User userInRepository;
     private ItemRequest itemRequestInRepository;
     private ItemRequestDto itemRequestDtoInput;
@@ -146,7 +146,7 @@ class ItemRequestServiceTest {
         //Получение по ID
         when(mockItemRequestRepository.findById(anyLong()))
                 .thenReturn(Optional.of(itemRequestInRepository));
-        assertEquals(itemRequestDtoListOutput.get(0),itemRequestService.get(1L, 1L));
+        assertEquals(itemRequestDtoListOutput.get(0), itemRequestService.get(1L, 1L));
         //Получение по ID без проверок
         assertEquals(itemRequestInRepository, itemRequestService.getRequest(1L));
     }

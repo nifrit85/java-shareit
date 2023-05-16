@@ -2,8 +2,9 @@ package ru.practicum.shareit.item.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -34,23 +35,30 @@ class ItemControllerTest {
     private ObjectMapper objectMapper;
     @MockBean
     private ItemService mockItemService;
+    private ItemDto itemDtoInput;
+    private ItemDto itemDtoOutput;
+
+    @BeforeEach
+    void beforeEach() {
+        //Входные данные
+        itemDtoInput = ItemDto.builder()
+                .id(1L)
+                .name("Дрель")
+                .description("Простая дрель")
+                .available(true)
+                .build();
+        //Ожидаемые данные
+        itemDtoOutput = ItemDto.builder()
+                .id(1L)
+                .name("Дрель")
+                .description("Простая дрель")
+                .available(true)
+                .build();
+    }
 
     @Test
+    @DisplayName("Сохранение вещи")
     void createTest() throws Exception {
-        //Запрос для сохранения
-        ItemDto itemDtoInput = ItemDto.builder()
-                .id(1L)
-                .name("Дрель")
-                .description("Простая дрель")
-                .available(true)
-                .build();
-        //Ожидаемый результат
-        ItemDto itemDtoOutput = ItemDto.builder()
-                .id(1L)
-                .name("Дрель")
-                .description("Простая дрель")
-                .available(true)
-                .build();
 
         when(mockItemService.create(any(ItemDto.class), anyLong()))
                 .thenReturn(itemDtoOutput);
@@ -104,22 +112,14 @@ class ItemControllerTest {
     }
 
     @Test
+    @DisplayName("Изменение вещи")
     void updateTest() throws Exception {
         //Входные данные
-        ItemDto itemDtoInput = ItemDto.builder()
-                .id(1L)
-                .name("Дрель upd")
-                .description("Простая дрель upd")
-                .available(false)
-                .build();
-
-        //Ожидаемый результат
-        ItemDto itemDtoOutput = ItemDto.builder()
-                .id(1L)
-                .name("Дрель upd")
-                .description("Простая дрель upd")
-                .available(false)
-                .build();
+        itemDtoInput.setName("updated");
+        itemDtoInput.setDescription("updated");
+        //Ожидаемые данные
+        itemDtoOutput.setName("updated");
+        itemDtoOutput.setDescription("updated");
 
         when(mockItemService.update(any(ItemDto.class), anyLong(), anyLong()))
                 .thenReturn(itemDtoOutput);
@@ -140,17 +140,10 @@ class ItemControllerTest {
     }
 
     @Test
+    @DisplayName("Получение вещи")
     void getTest() throws Exception {
 
-        //Ожидаемый результат
-        ItemDto itemDtoOutput = ItemDto.builder()
-                .id(1L)
-                .name("Дрель")
-                .description("Простая дрель")
-                .available(true)
-                .build();
-
-        Mockito.when(mockItemService.get(anyLong(), anyLong()))
+        when(mockItemService.get(anyLong(), anyLong()))
                 .thenReturn(itemDtoOutput);
 
         String result = mockMvc.perform(get("/items/1")
@@ -167,16 +160,8 @@ class ItemControllerTest {
     }
 
     @Test
+    @DisplayName("Получение всех вещей владельца")
     void getAll() throws Exception {
-
-        //Ожидаемый результат
-        ItemDto itemDtoOutput1 = ItemDto.builder()
-                .id(1L)
-                .name("Дрель")
-                .description("Простая дрель")
-                .available(true)
-                .build();
-
         ItemDto itemDtoOutput2 = ItemDto.builder()
                 .id(2L)
                 .name("Дрель+")
@@ -185,7 +170,7 @@ class ItemControllerTest {
                 .build();
 
         List<ItemDto> itemDtoList = new ArrayList<>();
-        itemDtoList.add(itemDtoOutput1);
+        itemDtoList.add(itemDtoOutput);
         itemDtoList.add(itemDtoOutput2);
 
         when(mockItemService.getAll(anyLong(), anyInt(), anyInt()))
@@ -206,15 +191,8 @@ class ItemControllerTest {
     }
 
     @Test
+    @DisplayName("Поиск вещи")
     void searchTest() throws Exception {
-        //Ожидаемый результат
-        ItemDto itemDtoOutput = ItemDto.builder()
-                .id(1L)
-                .name("Дрель")
-                .description("Простая дрель")
-                .available(true)
-                .build();
-
         List<ItemDto> itemDtoList = new ArrayList<>();
         itemDtoList.add(itemDtoOutput);
 
@@ -236,6 +214,7 @@ class ItemControllerTest {
     }
 
     @Test
+    @DisplayName("Удаление вещи")
     void deleteTest() throws Exception {
         doNothing().when(mockItemService).delete(anyLong(), anyLong());
         mockMvc.perform(delete("/items/1").header(USER_ID, 1L))
@@ -243,8 +222,8 @@ class ItemControllerTest {
     }
 
     @Test
+    @DisplayName("Сохранение комментария")
     void createCommentTest() throws Exception {
-
         //Входные данные
         CommentDto commentDtoInput = CommentDto.builder()
                 .id(1L)

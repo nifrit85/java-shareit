@@ -129,7 +129,7 @@ class UserServiceTest {
 
     @Test
     @DisplayName("Проверка исключения NotFound")
-    void NotFoundTest() {
+    void notFoundTest() {
         //Проверка изменения
         assertThrows(NotFound.class, () -> userService.update(1L, userDtoInput));
         //Проверка получения по id

@@ -47,4 +47,5 @@ public class ErrorHandler {
         log.warn(e.getMessage());
         return Map.of(ERROR, e.getMessage());
     }
+
 }
