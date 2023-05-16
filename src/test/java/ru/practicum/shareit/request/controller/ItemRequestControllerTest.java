@@ -2,6 +2,8 @@ package ru.practicum.shareit.request.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -33,20 +35,27 @@ class ItemRequestControllerTest {
     @MockBean
     private ItemRequestService mockItemRequestService;
 
-    @Test
-    void createTest() throws Exception {
-        //Запрос для сохранения
-        ItemRequestDto itemRequestDtoInput = ItemRequestDto.builder()
+    private ItemRequestDto itemRequestDtoInput;
+    private ItemRequestDto itemRequestDtoOutput;
+
+    @BeforeEach
+    void beforeEach() {
+        //Входные данные
+        itemRequestDtoInput = ItemRequestDto.builder()
                 .description("Хотел бы воспользоваться щёткой для обуви")
                 .build();
-        //Ожидаемый результат
-        ItemRequestDto itemRequestDtoOutput = ItemRequestDto.builder()
+        //Ожидаемые данные
+        itemRequestDtoOutput = ItemRequestDto.builder()
                 .id(1L)
                 .description("Хотел бы воспользоваться щёткой для обуви")
                 .created(LocalDateTime.now())
                 .items(new ArrayList<>())
                 .build();
+    }
 
+    @Test
+    @DisplayName("Сохранение реквеста")
+    void createTest() throws Exception {
         when(mockItemRequestService.create(any(ItemRequestDto.class), anyLong()))
                 .thenReturn(itemRequestDtoOutput);
 
@@ -75,6 +84,7 @@ class ItemRequestControllerTest {
     }
 
     @Test
+    @DisplayName("Получение реквеста")
     void getTest() throws Exception {
 
         ItemShortDto itemShortDto1 = ItemShortDto.builder()
@@ -147,7 +157,7 @@ class ItemRequestControllerTest {
         Assertions.assertEquals(objectMapper.writeValueAsString(itemRequestDtoList), result);
 
         //Получение конкретного реквеста
-        when(mockItemRequestService.get(anyLong(),anyLong()))
+        when(mockItemRequestService.get(anyLong(), anyLong()))
                 .thenReturn(itemRequestDtoFirst);
 
         result = mockMvc.perform(get("/requests/1")
@@ -163,6 +173,4 @@ class ItemRequestControllerTest {
         Assertions.assertEquals(objectMapper.writeValueAsString(itemRequestDtoFirst), result);
 
     }
-
-
 }

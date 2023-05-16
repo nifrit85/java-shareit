@@ -40,6 +40,7 @@ import static ru.practicum.shareit.booking.BookingStatus.APPROVED;
 
 @SpringBootTest
 class ItemServiceTest {
+    private static final LocalDateTime SOME_DATE = LocalDateTime.of(2023, 5, 9, 11, 20, 0);
     @MockBean
     private ItemRepository mockItemRepository;
     @Autowired
@@ -52,7 +53,6 @@ class ItemServiceTest {
     private CommentRepository mockCommentRepository;
     @MockBean
     private BookingRepository mockBookingRepository;
-    private static final LocalDateTime SOME_DATE = LocalDateTime.of(2023, 5, 9, 11, 20, 0);
     private User userInRepository;
     private ItemRequest itemRequestInRepository;
     private ItemDto itemDtoInput;

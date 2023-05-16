@@ -1,5 +1,7 @@
 package ru.practicum.shareit.request;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.json.JsonTest;
@@ -7,6 +9,7 @@ import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.json.JsonContent;
 import ru.practicum.shareit.item.model.ItemShortDto;
 import ru.practicum.shareit.request.model.ItemRequestDto;
+import ru.practicum.shareit.user.model.UserDto;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -20,17 +23,21 @@ class ItemRequestJsonTest {
     @Autowired
     private JacksonTester<ItemRequestDto> jacksonTester;
 
-    @Test
-    void dtoTest() throws IOException {
+    private ItemShortDto itemShortDto1;
+    private ItemShortDto itemShortDto2;
+    private ItemRequestDto itemRequestDto;
 
-        ItemShortDto itemShortDto1 = ItemShortDto.builder()
+
+    @BeforeEach
+    void beforeEach() {
+        itemShortDto1 = ItemShortDto.builder()
                 .id(1L)
                 .name("Белая щётка для обуви")
                 .description("Щётка для обуви")
                 .available(true)
                 .requestId(1L)
                 .build();
-        ItemShortDto itemShortDto2 = ItemShortDto.builder()
+        itemShortDto2 = ItemShortDto.builder()
                 .id(2L)
                 .name("Синяя щётка для обуви")
                 .description("Хорошая щётка")
@@ -43,12 +50,17 @@ class ItemRequestJsonTest {
         itemShortDtoList.add(itemShortDto2);
 
 
-        ItemRequestDto itemRequestDto = ItemRequestDto.builder()
+        itemRequestDto = ItemRequestDto.builder()
                 .id(1L)
                 .description("Хотел бы воспользоваться щёткой для обуви")
                 .created(LocalDateTime.of(2023, 5, 9, 15, 6, 1))
                 .items(itemShortDtoList)
                 .build();
+    }
+
+    @Test
+    @DisplayName("Сериализация ItemRequest")
+    void testSerialize() throws IOException {
 
         JsonContent<ItemRequestDto> json = jacksonTester.write(itemRequestDto);
         //Проверим что преобразование не вызвало изменений
@@ -65,6 +77,14 @@ class ItemRequestJsonTest {
         assertThat(json).extractingJsonPathValue("$.items[1]").extracting("description").isEqualTo(itemShortDto2.getDescription());
         assertThat(json).extractingJsonPathValue("$.items[1]").extracting("available").isEqualTo(itemShortDto2.getAvailable());
         assertThat(json).extractingJsonPathValue("$.items[1]").extracting("requestId").isEqualTo(1);
+    }
 
+    @Test
+    @DisplayName("ItemRequest")
+    void testDeserialize() throws IOException {
+        String itemRequestString = "{\"id\":1,\"description\":\"Хотел бы воспользоваться щёткой для обуви\",\"created\":\"2023-05-09T15:06:01\",\"items\":[{\"id\":1,\"name\":\"Белая щётка для обуви\",\"description\":\"Щётка для обуви\",\"available\":true,\"requestId\":1},{\"id\":2,\"name\":\"Синяя щётка для обуви\",\"description\":\"Хорошая щётка\",\"available\":true,\"requestId\":1}]}";
+
+        //Проверим десериализацию
+        assertThat(jacksonTester.parse(itemRequestString)).isEqualTo(itemRequestDto);
     }
 }

@@ -36,7 +36,9 @@ import static ru.practicum.shareit.booking.BookingStatus.*;
 
 @SpringBootTest
 class BookingServiceTest {
-
+    private static final LocalDateTime START = LocalDateTime.of(2023, 4, 16, 13, 44, 30);
+    private static final LocalDateTime END = LocalDateTime.of(2023, 6, 16, 13, 44, 30);
+    private static final LocalDateTime SOME_DATE = LocalDateTime.of(2023, 5, 9, 11, 20, 0);
     @MockBean
     private UserRepository mockUserRepository;
     @MockBean
@@ -45,17 +47,12 @@ class BookingServiceTest {
     private BookingRepository mockBookingRepository;
     @Autowired
     private BookingService bookingService;
-
     private User userInRepository;
     private User owner;
     private Item itemInRepository;
     private Booking bookingInRepository;
     private BookingRequestDto bookingRequestDtoInput;
     private BookingDto bookingDtoOutput;
-    private ItemRequest itemRequestInRepository;
-    private static final LocalDateTime START = LocalDateTime.of(2023, 4, 16, 13, 44, 30);
-    private static final LocalDateTime END = LocalDateTime.of(2023, 6, 16, 13, 44, 30);
-    private static final LocalDateTime SOME_DATE = LocalDateTime.of(2023, 5, 9, 11, 20, 0);
 
     @BeforeEach
     void beforeEach() {
@@ -72,7 +69,7 @@ class BookingServiceTest {
                 .email("owner@user.com")
                 .build();
         //Реквест в репозитории
-        itemRequestInRepository = ItemRequest.builder()
+        ItemRequest itemRequestInRepository = ItemRequest.builder()
                 .id(1L)
                 .description("Хотел бы воспользоваться дрелью")
                 .requestor(userInRepository)

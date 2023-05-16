@@ -5,20 +5,17 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import ru.practicum.shareit.booking.BookingStatus;
 import ru.practicum.shareit.booking.model.BookingDto;
 import ru.practicum.shareit.booking.model.BookingRequestDto;
 import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.model.UserDto;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
@@ -28,7 +25,6 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static ru.practicum.shareit.booking.BookingStatus.APPROVED;
 import static ru.practicum.shareit.booking.BookingStatus.WAITING;
@@ -48,34 +44,30 @@ class BookingControllerTest {
 
     private BookingRequestDto bookingRequestDtoInput;
     private BookingDto bookingDtoOutput;
-    private User userInRepository;
-    private User owner;
-    private ItemRequest itemRequestInRepository;
-    private Item itemInRepository;
 
     @BeforeEach
     void beforeEach() {
         //Пользователь в репозитории
-        userInRepository = User.builder()
+        User userInRepository = User.builder()
                 .id(1L)
                 .name("user")
                 .email("user@user.com")
                 .build();
         //Владелец в репозитории
-        owner = User.builder()
+        User owner = User.builder()
                 .id(2L)
                 .name("owner")
                 .email("owner@user.com")
                 .build();
         //Реквест в репозитории
-        itemRequestInRepository = ItemRequest.builder()
+        ItemRequest itemRequestInRepository = ItemRequest.builder()
                 .id(1L)
                 .description("Хотел бы воспользоваться дрелью")
                 .requestor(userInRepository)
                 .created(SOME_DATE)
                 .build();
         //Вещь в репозитории
-        itemInRepository = Item.builder()
+        Item itemInRepository = Item.builder()
                 .id(1L)
                 .request(itemRequestInRepository)
                 .owner(owner)
@@ -102,7 +94,7 @@ class BookingControllerTest {
     }
 
     @Test
-    @DisplayName("Cоздание бронирования")
+    @DisplayName("Создание бронирования")
     void createTest() throws Exception {
 
         when(mockBookingService.create(any(BookingRequestDto.class), anyLong()))
@@ -168,7 +160,7 @@ class BookingControllerTest {
     @Test
     @DisplayName("Получение бронирования")
     void getTest() throws Exception {
-        when(mockBookingService.get(anyLong(),anyLong()))
+        when(mockBookingService.get(anyLong(), anyLong()))
                 .thenReturn(bookingDtoOutput);
 
         //Получение по ID
@@ -188,7 +180,7 @@ class BookingControllerTest {
         List<BookingDto> bookingDtoList = new ArrayList<>();
         bookingDtoList.add(bookingDtoOutput);
 
-        when(mockBookingService.get(anyString(),anyLong(),anyInt(),anyInt()))
+        when(mockBookingService.get(anyString(), anyLong(), anyInt(), anyInt()))
                 .thenReturn(bookingDtoList);
 
         result = mockMvc.perform(get("/bookings")
@@ -206,7 +198,7 @@ class BookingControllerTest {
         Assertions.assertEquals(objectMapper.writeValueAsString(bookingDtoList), result);
 
         //Получение списка бронирований для всех вещей текущего пользователя
-        when(mockBookingService.getByOwner(anyString(),anyLong(),anyInt(),anyInt()))
+        when(mockBookingService.getByOwner(anyString(), anyLong(), anyInt(), anyInt()))
                 .thenReturn(bookingDtoList);
 
         result = mockMvc.perform(get("/bookings/owner")

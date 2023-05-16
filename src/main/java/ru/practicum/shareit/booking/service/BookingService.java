@@ -73,6 +73,7 @@ public interface BookingService {
      */
     List<BookingDto> getByOwner(String state, Long userId, Integer from, Integer size);
 
+
     /**
      * Метод получения списка бронирования
      *
