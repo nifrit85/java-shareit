@@ -10,6 +10,8 @@ import ru.practicum.shareit.booking.model.BookingRequestDto;
 import ru.practicum.shareit.booking.service.BookingService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 
@@ -47,16 +49,20 @@ public class BookingController {
 
     @GetMapping
     public List<BookingDto> get(@RequestParam(defaultValue = "ALL") String state,
-                                @RequestHeader(USER_ID) Long userId) {
-        log.info("Запрос GET: get(Long bookingId,Long userId) на получение списка всех бронирований текущего пользователя с ID = {}.", userId);
-        return bookingService.get(state, userId);
+                                @RequestHeader(USER_ID) Long userId,
+                                @RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
+                                @RequestParam(defaultValue = "10") @Positive Integer size) {
+        log.info("Запрос GET: get(Long bookingId,Long userId, Integer from, Integer size) на получение списка всех бронирований, постранично, текущего пользователя с ID = {}.", userId);
+        return bookingService.get(state, userId, from, size);
     }
 
     @GetMapping("/owner")
     public List<BookingDto> getByOwner(@RequestParam(defaultValue = "ALL") String state,
-                                       @RequestHeader(USER_ID) Long userId) {
-        log.info("Запрос GET: getByOwner(Long bookingId,Long userId) на получение списка бронирований для всех вещей текущего пользователя с ID = {}.", userId);
-        return bookingService.getByOwner(state, userId);
+                                       @RequestHeader(USER_ID) Long userId,
+                                       @RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
+                                       @RequestParam(defaultValue = "10") @Positive Integer size) {
+        log.info("Запрос GET: getByOwner(Long bookingId,Long userId, Integer from, Integer size) на получение списка бронирований, постранично, для всех вещей текущего пользователя с ID = {}.", userId);
+        return bookingService.getByOwner(state, userId, from, size);
     }
 
 }

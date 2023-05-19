@@ -2,6 +2,9 @@ package ru.practicum.shareit.item.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +21,9 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.model.ItemDto;
 import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.request.model.ItemRequest;
+import ru.practicum.shareit.request.service.ItemRequestService;
+
 import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
@@ -27,7 +33,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-@AllArgsConstructor
+@AllArgsConstructor()
 @Slf4j
 public class ItemServiceImpl implements ItemService {
 
@@ -35,7 +41,7 @@ public class ItemServiceImpl implements ItemService {
     private final UserService userService;
     private final BookingService bookingService;
     private final CommentRepository commentRepository;
-
+    private final ItemRequestService itemRequestService;
     private final Sort sortComments = Sort.by(Sort.Direction.DESC, "created");
 
     @Override
@@ -43,6 +49,9 @@ public class ItemServiceImpl implements ItemService {
     public ItemDto create(ItemDto itemDto, Long userId) {
         Item item = ItemMapper.toModel(itemDto);
         item.setOwner(UserMapper.toModel(userService.get(userId)));
+        if (itemDto.getRequestId() != null) {
+            item.setRequest(itemRequestService.getRequest(itemDto.getRequestId()));
+        }
         Item savedItem = itemRepository.save(item);
         log.debug("Вещь добавлена {}", savedItem);
         return ItemMapper.toDto(savedItem);
@@ -76,7 +85,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     @Transactional(readOnly = true)
     public ItemDto get(Long itemId, Long userId) {
-        userService.get(userId);
+        userService.existsById(userId);
         Item item = itemRepository.findById(itemId).orElseThrow(() -> new NotFound("вещь", itemId));
         ItemDto itemDto = ItemMapper.toDto(item);
         itemDto.setComments(commentRepository.findAllByItemIdIn(Collections.singletonList(itemDto.getId()), sortComments)
@@ -103,12 +112,16 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ItemDto> getAll(Long userId) {
+    public List<ItemDto> getAll(Long userId, Integer from, Integer size) {
         userService.existsById(userId);
+        Pageable pageable = PageRequest.of(
+                from == 0 ? 0 : (from / size),
+                size,
+                Sort.by(Sort.Direction.ASC, "id"));
 
-        List<Item> items = itemRepository.findAllByOwnerIdOrderByIdAsc(userId);
+        List<Item> items = itemRepository.findAllByOwnerId(userId, pageable);
 
-        Map<Item, List<Booking>> allBooking = bookingService.findAllByItemInAndStatus(itemRepository.findAllByOwnerIdOrderByIdAsc(userId), BookingStatus.APPROVED)
+        Map<Item, List<Booking>> allBooking = bookingService.findAllByItemInAndStatus(items, BookingStatus.APPROVED)
                 .stream()
                 .collect(Collectors.groupingBy(Booking::getItem, Collectors.toList()));
 
@@ -152,11 +165,14 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ItemDto> find(String text) {
+    public List<ItemDto> find(String text, Integer from, Integer size) {
         if (text.isBlank()) {
             return new ArrayList<>();
         }
-        return itemRepository.findAllByNameOrDescriptionContainingIgnoreCaseAndAvailableTrue(text, text)
+        Pageable pageable = PageRequest.of(
+                from == 0 ? 0 : (from / size),
+                size);
+        return itemRepository.findAllByNameOrDescriptionContainingIgnoreCaseAndAvailableTrue(text, text, pageable)
                 .stream()
                 .map(ItemMapper::toDto)
                 .collect(Collectors.toList());
@@ -190,5 +206,11 @@ public class ItemServiceImpl implements ItemService {
     @Transactional(readOnly = true)
     public Item get(Long itemId) {
         return itemRepository.findById(itemId).orElseThrow(() -> new NotFound("вещь", itemId));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Item> findAllByRequestIn(List<ItemRequest> itemRequests) {
+        return itemRepository.findAllByRequestIn(itemRequests);
     }
 }

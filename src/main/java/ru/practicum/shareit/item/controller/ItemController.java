@@ -11,6 +11,8 @@ import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.marker.Marker;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 @RestController
@@ -48,15 +50,19 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<ItemDto> getAll(@RequestHeader(USER_ID) Long userId) {
-        log.info("Запрос GET: get(Long userId) на получение всех вещей.");
-        return itemService.getAll(userId);
+    public List<ItemDto> getAll(@RequestHeader(USER_ID) Long userId,
+                                @RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
+                                @RequestParam(defaultValue = "10") @Positive Integer size) {
+        log.info("Запрос GET: getAll(Long userId,Integer from, Integer size) на получение всех вещей постранично.");
+        return itemService.getAll(userId, from, size);
     }
 
     @GetMapping("/search")
-    public List<ItemDto> find(@RequestParam String text) {
-        log.info("Запрос GET: find(String text) на получение всех вещей содержащих '{}' в названии или описании.", text);
-        return itemService.find(text);
+    public List<ItemDto> find(@RequestParam String text,
+                              @RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
+                              @RequestParam(defaultValue = "10") @Positive Integer size) {
+        log.info("Запрос GET: find(String text, Integer from, Integer size) на получение всех вещей, постранично, содержащих '{}' в названии или описании.", text);
+        return itemService.find(text, from, size);
     }
 
     @DeleteMapping("/{itemId}")

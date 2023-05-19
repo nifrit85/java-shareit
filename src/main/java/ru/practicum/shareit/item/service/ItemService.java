@@ -4,6 +4,7 @@ import ru.practicum.shareit.exception.NotFound;
 import ru.practicum.shareit.item.model.CommentDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.model.ItemDto;
+import ru.practicum.shareit.request.model.ItemRequest;
 
 import java.util.List;
 
@@ -42,21 +43,24 @@ public interface ItemService {
     ItemDto get(Long itemId, Long userId);
 
     /**
-     * Метод получения всех вещей владльца
+     * Метод получения всех вещей владельца, постранично
      *
      * @param userId Id владельца вещи
+     * @param from   Индекс первого элемента
+     * @param size   Количество элементов для отображения
      * @return Список DTO вещей
      * @throws NotFound Пользователь не найден
      */
-    List<ItemDto> getAll(Long userId);
+    List<ItemDto> getAll(Long userId, Integer from, Integer size);
 
     /**
-     * Метод поиска вещи по наименованию или описанию
-     *
+     * Метод поиска вещи, постранично, по наименованию или описанию
      * @param text Искомый текст
+     * @param from Индекс первого элемента
+     * @param size Количество элементов для отображения
      * @return Список DTO вещей
      */
-    List<ItemDto> find(String text);
+    List<ItemDto> find(String text, Integer from, Integer size);
 
     /**
      * Метод удаление вещи
@@ -88,4 +92,13 @@ public interface ItemService {
      * @throws NotFound Вещь не найдена
      */
     Item get(Long itemId);
+
+    /**
+     * Метод получения списка всех вещей по списку запросов
+     *
+     * @param itemRequests список запросов
+     * @return список вещей
+     */
+    List<Item> findAllByRequestIn(List<ItemRequest> itemRequests);
+
 }

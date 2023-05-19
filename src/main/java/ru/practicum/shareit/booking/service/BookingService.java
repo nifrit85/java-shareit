@@ -50,26 +50,29 @@ public interface BookingService {
     BookingDto get(Long bookingId, Long userId);
 
     /**
-     * Метод получения списка бронирования
+     * Метод получения списка бронирования, постранично
      *
      * @param state  Стутус бронирования
      * @param userId Id пользователя
+     * @param from   Индекс первого элемента
+     * @param size   Количество элементов для отображения
      * @return Список объектов DTO бронирования
      * @throws NotFound                 Пользователь не найден
      * @throws IllegalArgumentException Неверный статус
      */
-    List<BookingDto> get(String state, Long userId);
+    List<BookingDto> get(String state, Long userId, Integer from, Integer size);
 
     /**
-     * Метод получения списка бронирования для владельца вещей
-     *
      * @param state  Стутус бронирования
      * @param userId Id владельца вещи
+     * @param from   Индекс первого элемента
+     * @param size   Количество элементов для отображения
      * @return Список объектов DTO бронирования
      * @throws NotFound                 Пользователь не найден
-     * @throws IllegalArgumentException Неверный статус
+     * @throws IllegalArgumentException Неверный статус     *
      */
-    List<BookingDto> getByOwner(String state, Long userId);
+    List<BookingDto> getByOwner(String state, Long userId, Integer from, Integer size);
+
 
     /**
      * Метод получения списка бронирования
