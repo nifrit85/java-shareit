@@ -5,8 +5,6 @@ import org.springframework.core.NestedExceptionUtils;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.MissingRequestHeaderException;
-import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -29,12 +27,9 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler({ConstraintViolationException.class,
-            MissingRequestHeaderException.class,
             IllegalArgumentException.class,
             NotAvailable.class,
-            MissingServletRequestParameterException.class,
-            MethodArgumentNotValidException.class,
-            UnsupportedStatus.class})
+            MethodArgumentNotValidException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Map<String, String> handleException(final Exception e) {
         log.warn(e.getMessage());
