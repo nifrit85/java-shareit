@@ -1,5 +1,6 @@
 package ru.practicum.shareit.item.service;
 
+import ru.practicum.shareit.item.model.CommentDto;
 import ru.practicum.shareit.item.model.ItemDto;
 
 import java.util.List;
@@ -9,36 +10,37 @@ public interface ItemService {
      * Метод добавления новой вещи
      *
      * @param itemDto объект DTO вещи
-     * @param ownerId Id владельца вещи
+     * @param userId  Id владельца вещи
      * @return Объект DTO вещи
      */
-    ItemDto create(ItemDto itemDto, Long ownerId);
+    ItemDto create(ItemDto itemDto, Long userId);
 
     /**
      * Метод изменения вещи
      *
      * @param itemDto объект DTO вещи
      * @param itemId  Id вещи, которую необходимо изменить
-     * @param ownerId Id владельца вещи
+     * @param userId  Id владельца вещи
      * @return Объект DTO вещи
      */
-    ItemDto update(ItemDto itemDto, Long itemId, Long ownerId);
+    ItemDto update(ItemDto itemDto, Long itemId, Long userId);
 
     /**
      * Метод получения вещи
      *
      * @param itemId Id вещи
+     * @param userId Id владельца вещи
      * @return Объект DTO вещи
      */
-    ItemDto get(Long itemId);
+    ItemDto get(Long itemId, Long userId);
 
     /**
      * Метод получения всех вещей владльца
      *
-     * @param ownerId Id владельца вещи
+     * @param userId Id владельца вещи
      * @return Список DTO вещей
      */
-    List<ItemDto> getAll(Long ownerId);
+    List<ItemDto> getAll(Long userId);
 
     /**
      * Метод поиска вещи по наименованию или описанию
@@ -51,8 +53,18 @@ public interface ItemService {
     /**
      * Метод удаление вещи
      *
-     * @param itemId  Id вещи, которую необходимо удалить
-     * @param ownerId Id владельца вещи
+     * @param itemId Id вещи, которую необходимо удалить
+     * @param userId Id владельца вещи
      */
-    void delete(Long itemId, Long ownerId);
+    void delete(Long itemId, Long userId);
+
+    /**
+     * Метод добавления комментария
+     *
+     * @param commentDto Объект комментария
+     * @param userId     Id пользователя, оставивщего комментарий
+     * @param itemId     Id вещи к которой оставили комментарий
+     * @return Объект комментария
+     */
+    CommentDto createComment(CommentDto commentDto, Long itemId, Long userId);
 }
