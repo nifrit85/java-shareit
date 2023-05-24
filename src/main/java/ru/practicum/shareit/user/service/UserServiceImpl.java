@@ -1,56 +1,77 @@
 package ru.practicum.shareit.user.service;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.shareit.exception.NotFound;
 import ru.practicum.shareit.user.UserMapper;
-import ru.practicum.shareit.user.dao.UserDao;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.model.UserDto;
+import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class UserServiceImpl implements UserService {
 
-    private final UserDao userDao;
+    private static final String USER = "пользователь";
+
+    private final UserRepository userRepository;
 
     @Override
+    @Transactional
     public UserDto create(UserDto userDto) {
-        User user = UserMapper.toModel(userDto);
-        return UserMapper.toDto(userDao.create(user));
+        User savedUser = userRepository.save(UserMapper.toModel(userDto));
+        log.debug("Пользователь создан {}", savedUser);
+        return UserMapper.toDto(savedUser);
     }
 
     @Override
+    @Transactional
     public UserDto update(Long id, UserDto userDto) {
-        User user = UserMapper.toModel(userDto);
-        User userToUpdate = UserMapper.toModel(get(id));
-        if (user.getName() != null) {
-            userToUpdate.setName(user.getName());
+        User userToUpdate = userRepository.findById(id).orElseThrow(() -> new NotFound(USER, id));
+        if (userDto.getName() != null) {
+            userToUpdate.setName(userDto.getName());
         }
-        if (user.getEmail() != null) {
-            userDao.removeEmail(userToUpdate.getEmail());
-            userToUpdate.setEmail(user.getEmail());
+        if (userDto.getEmail() != null) {
+            userToUpdate.setEmail(userDto.getEmail());
         }
-        return UserMapper.toDto(userDao.update(userToUpdate));
+        User updatedUser = userRepository.save(userToUpdate);
+        log.debug("Пользователь обновлён {}", updatedUser);
+        return UserMapper.toDto(updatedUser);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public UserDto get(Long id) {
-        return UserMapper.toDto(userDao.get(id));
+        return UserMapper.toDto(userRepository.findById(id).orElseThrow(() -> new NotFound(USER, id)));
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<UserDto> get() {
-        return userDao.get()
+        return userRepository.findAll()
                 .stream()
                 .map(UserMapper::toDto)
                 .collect(Collectors.toList());
     }
 
     @Override
+    @Transactional
     public void delete(Long id) {
-        userDao.delete(id);
+        existsById(id);
+        userRepository.deleteById(id);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public void existsById(Long userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new NotFound(USER, userId);
+        }
     }
 }
