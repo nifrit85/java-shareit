@@ -18,6 +18,8 @@ import java.util.stream.Collectors;
 @Slf4j
 public class UserServiceImpl implements UserService {
 
+    private static final String USER = "пользователь";
+
     private final UserRepository userRepository;
 
     @Override
@@ -31,7 +33,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserDto update(Long id, UserDto userDto) {
-        User userToUpdate = userRepository.findById(id).orElseThrow(() -> new NotFound("пользователь", id));
+        User userToUpdate = userRepository.findById(id).orElseThrow(() -> new NotFound(USER, id));
         if (userDto.getName() != null) {
             userToUpdate.setName(userDto.getName());
         }
@@ -46,7 +48,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(readOnly = true)
     public UserDto get(Long id) {
-        return UserMapper.toDto(userRepository.findById(id).orElseThrow(() -> new NotFound("пользователь", id)));
+        return UserMapper.toDto(userRepository.findById(id).orElseThrow(() -> new NotFound(USER, id)));
     }
 
     @Override
@@ -62,5 +64,13 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void delete(Long id) {
         userRepository.deleteById(id);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public void existsById(Long userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new NotFound(USER, userId);
+        }
     }
 }
